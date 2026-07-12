@@ -4,18 +4,14 @@ build-backend = "hatchling.build"
 
 [project]
 name = "vision-engine"
-version = "0.1.0"
+version = "0.2.0"
 description = "Vision engine para deteccion local"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = []
 
 [project.optional-dependencies]
-dev = [
-  "pyright>=1.1.400",
-  "pytest>=8.0.0",
-  "ruff>=0.6.0",
-]
+dev = ["pyright>=1.1.400", "pytest>=8.0.0", "ruff>=0.6.0"]
 
 [project.scripts]
 vision-engine = "main:main"
@@ -43,6 +39,4 @@ testpaths = ["tests"]
 addopts = "-q"
 
 [dependency-groups]
-dev = [
-    "bump-my-version>=1.4.1",
-]
+dev = []
