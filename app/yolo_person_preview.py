@@ -37,7 +37,7 @@ def _draw_detection_box(cv2: Any, frame: Any, detection: PersonDetection) -> Non
         img=frame,
         pt1=(detection.x1, detection.y1),
         pt2=(detection.x2, detection.y2),
-        color=(0, 200, 255),
+        color=(255, 0, 0),
         thickness=2,
     )
     cv2.putText(

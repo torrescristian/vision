@@ -7,6 +7,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Callable, Iterable
 
+from models.YoloClass import YoloClass
+
 InferFn = Callable[[Any], Iterable[Any]]
 
 
@@ -89,7 +91,7 @@ class YoloPersonDetector:
                 class_id = int(_first_number(getattr(box, "cls", 0)))
                 confidence = _first_number(getattr(box, "conf", 0.0))
 
-                if class_id != 0 or confidence < self._confidence_threshold:
+                if class_id != YoloClass.PERSON or confidence < self._confidence_threshold:
                     continue
 
                 x1, y1, x2, y2 = _xyxy_to_ints(getattr(box, "xyxy"))
