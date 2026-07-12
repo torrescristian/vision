@@ -13,16 +13,20 @@ Base del proyecto para deteccion de caidas usando vision por computadora.
 
    uv venv
 
-2. Activar entorno:
+2. Instalar dependencias (app + dev):
 
-   source .venv/bin/activate
+   uv pip install --python .venv/bin/python -e ".[dev]"
 
-3. Instalar dependencias de desarrollo:
+## Comandos utiles
 
-   uv pip install -e ".[dev]"
+- Lint: `uv run ruff check .`
+- Typecheck: `uv run pyright .`
+- Tests: `uv run pytest`
 
-4. Ejecutar validaciones:
+## Hito A.1 - Captura de Camara
 
-   ruff check .
-   pyright .
-   pytest
+Ejecutar preview de webcam con FPS:
+
+`uv run vision-camera --camera-index 0 --width 1280 --height 720`
+
+Salir con `q` o `ESC`.
