@@ -2,6 +2,8 @@
 
 Este nivel responde: **¿Qué funciones/métodos coordinan el comportamiento real?**
 
+Si necesitas ver primero el cableado completo de objetos y flujo de frame, revisa antes `c4b_wiring_example.md`.
+
 ## C4.1 Flujo de ejecución del pipeline
 
 ```mermaid

@@ -33,6 +33,7 @@ class AppConfig:
 
 
 def _env_int(name: str, default: int) -> int:
+    # Patron comun en este proyecto: env var opcional con fallback a default.
     value = os.getenv(name)
     if value is None:
         return default
@@ -40,6 +41,7 @@ def _env_int(name: str, default: int) -> int:
 
 
 def _env_float(name: str, default: float) -> float:
+    # Se usa para thresholds y parametros continuos de inferencia.
     value = os.getenv(name)
     if value is None:
         return default
@@ -55,6 +57,8 @@ def _env_str(name: str, default: str) -> str:
 
 def load_config() -> AppConfig:
     """Carga la configuracion, permitiendo override por variables de entorno."""
+    # Fuente de verdad de runtime: los entrypoints no hardcodean parametros,
+    # siempre consultan este objeto primero.
     return AppConfig(
         camera=CameraConfig(
             index=_env_int("VISION_CAMERA_INDEX", 0),

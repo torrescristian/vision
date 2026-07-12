@@ -25,6 +25,8 @@ class PersonDetection:
 
 def _first_number(value: Any) -> float:
     """Extrae un numero de estructuras como tensor/lista/escalares."""
+    # Ultralytics puede devolver escalares, tensores o listas anidadas.
+    # Esta funcion normaliza todo a float para simplificar el flujo posterior.
     current = value
     while isinstance(current, (list, tuple)):
         if not current:
@@ -39,6 +41,8 @@ def _first_number(value: Any) -> float:
 
 def _xyxy_to_ints(raw_xyxy: Any) -> tuple[int, int, int, int]:
     """Normaliza coordenadas `xyxy` a enteros."""
+    # El objetivo es tener siempre (x1, y1, x2, y2) como ints para dibujar
+    # en OpenCV sin condicionales extra por tipo.
     current = raw_xyxy
     while isinstance(current, (list, tuple)) and current and isinstance(current[0], (list, tuple)):
         current = current[0]
@@ -91,6 +95,8 @@ class YoloPersonDetector:
                 class_id = int(_first_number(getattr(box, "cls", 0)))
                 confidence = _first_number(getattr(box, "conf", 0.0))
 
+                # YOLO devuelve todas las clases detectadas.
+                # Aqui filtramos solo persona y por confianza minima.
                 if class_id != YoloClass.PERSON or confidence < self._confidence_threshold:
                     continue
 

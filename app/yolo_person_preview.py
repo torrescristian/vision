@@ -66,6 +66,7 @@ def _draw_global_overlay(cv2: Any, frame: Any, fps: float, people_count: int) ->
 
 
 def run_yolo_person_preview(config: YoloPreviewConfig, *, cv2_module: Any | None = None) -> None:
+    # Fase 1: wiring de dependencias e inicializacion de recursos.
     cv2 = load_cv2(cv2_module)
     detector = YoloPersonDetector.from_model_path(
         model_path=config.model_path,
@@ -86,6 +87,7 @@ def run_yolo_person_preview(config: YoloPreviewConfig, *, cv2_module: Any | None
 
     last_tick = time.perf_counter()
     try:
+        # Fase 2: loop principal de runtime (capture -> detect -> draw -> show).
         while True:
             ok, frame = capture.read()
             if not ok:
