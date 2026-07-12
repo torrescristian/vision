@@ -9,7 +9,7 @@ flowchart LR
     cfg[load_config]
     cv[load_cv2]
     cap[open_capture]
-    det[YoloPersonDetector.from_model_path]
+    det[YoloPoseByteTrackDetector.from_model_path]
     loop[while True]
     draw[_draw_detection_box + _draw_global_overlay]
     out[cv2.imshow]
@@ -28,7 +28,7 @@ flowchart LR
 sequenceDiagram
     participant App as yolo_person_preview
     participant Cam as cv2.VideoCapture
-    participant Det as YoloPersonDetector
+    participant Det as YoloPoseByteTrackDetector
     participant Y as Ultralytics YOLO
 
     App->>Cam: read()

@@ -38,25 +38,29 @@ Métodos clave:
 ```mermaid
 sequenceDiagram
     participant Preview as yolo_person_preview
-    participant Detector as YoloPersonDetector
-    participant Model as Ultralytics YOLO
+    participant Detector as YoloPoseByteTrackDetector
+    participant Model as Ultralytics YOLO.track
+    participant Render as pose_renderer
 
-    Preview->>Detector: from_model_path(model, threshold)
+    Preview->>Detector: from_model_path(model, threshold, tracker)
     loop por frame
         Preview->>Detector: detect(frame)
-        Detector->>Model: infer(frame)
-        Model-->>Detector: results.boxes
-        Detector-->>Preview: list[PersonDetection]
-        Preview->>Preview: draw bbox + confidence + FPS
+        Detector->>Model: track(frame, persist=True)
+        Model-->>Detector: results.boxes + results.keypoints + track_id
+        Detector-->>Preview: list[TrackedPerson]
+        Preview->>Render: draw_detection_box / draw_pose_keypoints
+        Preview->>Render: draw_pose_skeleton (opcional)
+        Preview->>Render: draw_global_overlay
     end
 ```
 
 Funciones clave:
 
 1. `run_yolo_person_preview()`
-2. `_draw_detection_box()`
-3. `_draw_global_overlay()`
-4. `YoloPersonDetector.detect()`
+2. `YoloPoseByteTrackDetector.detect()`
+3. `draw_pose_keypoints()`
+4. `draw_pose_skeleton()`
+5. `draw_global_overlay()`
 
 ## C4.3 Flujo de configuración
 
@@ -77,7 +81,7 @@ flowchart TB
 Si quieres profundizar en código:
 
 1. Revisa `services/pipeline/engine.py` para ciclo de vida del pipeline.
-2. Revisa `detectors/yolo_person.py` para mapeo YOLO -> dominio.
+2. Revisa `detectors/yolo_pose_bytetrack.py` para mapeo YOLO/ByteTrack -> dominio.
 3. Revisa `config.py` para precedencia de configuración.
 
 ## Zoom atrás

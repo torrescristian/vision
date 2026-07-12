@@ -33,21 +33,24 @@ Componentes clave:
 ```mermaid
 flowchart TB
     preview[yolo_person_preview.py]
-    detector[YoloPersonDetector]
-    yolo[Ultralytics YOLO]
-    person[PersonDetection]
+    detector[YoloPoseByteTrackDetector]
+    yolo[Ultralytics YOLO track]
+    tracked[TrackedPerson]
+    render[pose_renderer.py]
 
     preview --> detector
     detector --> yolo
-    detector --> person
-    person --> preview
+    detector --> tracked
+    tracked --> render
+    render --> preview
 ```
 
 Componentes clave:
 
-1. `YoloPersonDetector.from_model_path()`: carga pesos/modelo.
-2. `YoloPersonDetector.detect()`: filtra clase `person` + threshold.
-3. `PersonDetection`: bounding box + confidence.
+1. `YoloPoseByteTrackDetector.from_model_path()`: carga modelo y tracker config.
+2. `YoloPoseByteTrackDetector.detect()`: filtra `person` y mapea a `TrackedPerson`.
+3. `TrackedPerson`: `track_id` + `Detection` + `keypoints` opcionales.
+4. `pose_renderer.py`: dibuja bbox, keypoints, skeleton y overlays globales.
 
 ## C3.3 Configuración
 

@@ -10,7 +10,7 @@ Validar deteccion de personas con YOLO sobre webcam en tiempo real.
 
    Comando:
 
-   `uv run vision-yolo --camera-index 0 --width 1280 --height 720 --model yolov8n.pt --confidence 0.45`
+   `uv run vision-yolo --camera-index 0 --width 1280 --height 720 --model yolo11n-pose.pt --confidence 0.45 --tracker-config bytetrack.yaml`
 
    Resultado esperado:
 

@@ -34,8 +34,9 @@ def test_detector_filters_only_person_class_and_threshold() -> None:
 
     assert len(detections) == 1
     first = detections[0]
-    assert (first.x1, first.y1, first.x2, first.y2) == (10, 20, 30, 40)
+    assert (first.bbox.x1, first.bbox.y1, first.bbox.x2, first.bbox.y2) == (10, 20, 30, 40)
     assert first.confidence == 0.91
+    assert first.subject.label == "person"
 
 
 def test_detector_supports_empty_results() -> None:

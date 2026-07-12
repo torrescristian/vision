@@ -178,17 +178,17 @@ Completado (2026-07-12).
 
 ### Evidencia de implementación
 
-- Integración YOLO implementada con detector de personas en `detectors/yolo_person.py`.
+- Integración YOLO en runtime implementada con `detectors/yolo_pose_bytetrack.py`.
 - Runner en vivo agregado en `app/yolo_person_preview.py`.
 - Script CLI disponible: `uv run vision-yolo`.
-- Overlay en runtime con bounding boxes, confidence y FPS.
+- Overlay en runtime con bounding boxes, confidence, keypoints, skeleton y FPS.
 
 ### Verificación técnica
 
 - `uv run ruff check .` en verde.
 - `uv run pyright .` en verde.
 - `uv run pytest` en verde.
-- Corrida manual confirmada: `uv run vision-yolo --camera-index 0 --width 1280 --height 720 --model yolov8n.pt --confidence 0.45`.
+- Corrida manual confirmada: `uv run vision-yolo --camera-index 0 --width 1280 --height 720 --model yolo11n-pose.pt --confidence 0.45 --tracker-config bytetrack.yaml`.
 
 ### Tests manuales
 
@@ -216,6 +216,30 @@ Separar dominio de YOLO.
 
 Nunca depender directamente del formato de Ultralytics.
 
+### Estado
+
+Completado (2026-07-12).
+
+### Evidencia de implementación
+
+- Entidades de dominio creadas en `models/detections.py`: `BoundingBox`, `Person`, `Detection`.
+- El detector `detectors/yolo_person.py` ya no expone formato crudo de Ultralytics.
+- El resto de la app consume objetos de dominio de detección.
+
+### Verificación técnica
+
+- `uv run ruff check .` en verde.
+- `uv run pyright .` en verde.
+- `uv run pytest` en verde.
+
+### Tests manuales
+
+Ver checklist: [a5_tests_manuales.md](a5_tests_manuales.md)
+
+### Criterio de salida
+
+Cumplido.
+
 ---
 
 # Hito A.6 - Tracking
@@ -231,6 +255,33 @@ Persona 2
 ```
 
 Persistir ID entre frames.
+
+### Estado
+
+Completado (2026-07-12).
+
+### Evidencia de implementación
+
+- Tracking con YOLO11 Pose + ByteTrack implementado en `detectors/yolo_pose_bytetrack.py`.
+- Integración activa en `app/yolo_person_preview.py` con `model.track(..., tracker='bytetrack.yaml')`.
+- Overlay en runtime con IDs persistentes `Person <id>` provenientes de ByteTrack.
+- `TrackedPerson` movido a dominio en `models/tracked_person.py`.
+- Render desacoplado en `app/pose_renderer.py`.
+- Código muerto purgado: se eliminó tracker por centroides legacy.
+
+### Verificación técnica
+
+- `uv run ruff check .` en verde.
+- `uv run pyright .` en verde.
+- `uv run pytest` en verde.
+
+### Tests manuales
+
+Ver checklist: [a6_tests_manuales.md](a6_tests_manuales.md)
+
+### Criterio de salida
+
+Cumplido.
 
 ---
 

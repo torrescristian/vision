@@ -16,8 +16,14 @@ from app.camera_preview import (
     open_capture,
     print_startup_message,
 )
+from app.pose_renderer import (
+    draw_detection_box,
+    draw_global_overlay,
+    draw_pose_keypoints,
+    draw_pose_skeleton,
+)
 from config import load_config
-from detectors.yolo_person import PersonDetection, YoloPersonDetector
+from detectors.yolo_pose_bytetrack import YoloPoseByteTrackDetector
 
 EXIT_KEYS = (ord("q"), 27)
 
@@ -29,48 +35,18 @@ class YoloPreviewConfig:
     height: int
     model_path: str
     confidence_threshold: float
+    tracker_config: str = "bytetrack.yaml"
+    draw_skeleton: bool = True
     window_name: str = "Vision Engine - YOLO Person"
-
-
-def _draw_detection_box(cv2: Any, frame: Any, detection: PersonDetection) -> None:
-    cv2.rectangle(
-        img=frame,
-        pt1=(detection.x1, detection.y1),
-        pt2=(detection.x2, detection.y2),
-        color=(255, 0, 0),
-        thickness=2,
-    )
-    cv2.putText(
-        img=frame,
-        text=f"person {detection.confidence:.2f}",
-        org=(detection.x1, max(detection.y1 - 8, 20)),
-        fontFace=cv2.FONT_HERSHEY_SIMPLEX,
-        fontScale=0.65,
-        color=(0, 200, 255),
-        thickness=2,
-        lineType=cv2.LINE_AA,
-    )
-
-
-def _draw_global_overlay(cv2: Any, frame: Any, fps: float, people_count: int) -> None:
-    cv2.putText(
-        img=frame,
-        text=f"FPS: {fps:.1f}  Persons: {people_count}",
-        org=(12, 30),
-        fontFace=cv2.FONT_HERSHEY_SIMPLEX,
-        fontScale=0.85,
-        color=(0, 255, 0),
-        thickness=2,
-        lineType=cv2.LINE_AA,
-    )
 
 
 def run_yolo_person_preview(config: YoloPreviewConfig, *, cv2_module: Any | None = None) -> None:
     # Fase 1: wiring de dependencias e inicializacion de recursos.
     cv2 = load_cv2(cv2_module)
-    detector = YoloPersonDetector.from_model_path(
+    detector = YoloPoseByteTrackDetector.from_model_path(
         model_path=config.model_path,
         confidence_threshold=config.confidence_threshold,
+        tracker_config=config.tracker_config,
     )
 
     camera_config = CameraPreviewConfig(
@@ -93,15 +69,18 @@ def run_yolo_person_preview(config: YoloPreviewConfig, *, cv2_module: Any | None
             if not ok:
                 raise RuntimeError("No se pudo leer un frame desde la webcam")
 
-            detections = detector.detect(frame)
+            tracked_people = detector.detect(frame)
 
-            for detection in detections:
-                _draw_detection_box(cv2, frame, detection)
+            for tracked in tracked_people:
+                draw_detection_box(cv2, frame, tracked)
+                draw_pose_keypoints(cv2, frame, tracked)
+                if config.draw_skeleton:
+                    draw_pose_skeleton(cv2, frame, tracked)
 
             current_tick = time.perf_counter()
             fps = compute_fps(last_tick, current_tick)
             last_tick = current_tick
-            _draw_global_overlay(cv2, frame, fps=fps, people_count=len(detections))
+            draw_global_overlay(cv2, frame, fps=fps, people_count=len(tracked_people))
 
             cv2.imshow(config.window_name, frame)
             key = cv2.waitKey(1) & 0xFF
@@ -126,6 +105,18 @@ def _build_parser() -> argparse.ArgumentParser:
         default=app_config.yolo.person_confidence_threshold,
         help="Threshold minimo para aceptar detecciones de persona",
     )
+    parser.add_argument(
+        "--tracker-config",
+        type=str,
+        default=app_config.yolo.tracker_config,
+        help="Archivo de tracker Ultralytics (ej: bytetrack.yaml)",
+    )
+    parser.add_argument(
+        "--draw-skeleton",
+        action=argparse.BooleanOptionalAction,
+        default=app_config.yolo.draw_skeleton,
+        help="Dibuja lineas del esqueleto COCO encima de los keypoints",
+    )
     return parser
 
 
@@ -141,6 +132,8 @@ def main(argv: Sequence[str] | None = None) -> None:
             height=args.height,
             model_path=args.model,
             confidence_threshold=args.confidence,
+            tracker_config=args.tracker_config,
+            draw_skeleton=args.draw_skeleton,
         )
     )
 

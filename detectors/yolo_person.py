@@ -4,23 +4,12 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 from typing import Any, Callable, Iterable
 
-from models.YoloClass import YoloClass
+from models.detections import BoundingBox, Detection, Person
+from models.yolo_class import YoloClass
 
 InferFn = Callable[[Any], Iterable[Any]]
-
-
-@dataclass(frozen=True, slots=True)
-class PersonDetection:
-    """Representa una deteccion de persona en un frame."""
-
-    x1: int
-    y1: int
-    x2: int
-    y2: int
-    confidence: float
 
 
 def _first_number(value: Any) -> float:
@@ -81,9 +70,9 @@ class YoloPersonDetector:
 
         return cls(infer=_infer, confidence_threshold=confidence_threshold)
 
-    def detect(self, frame: Any) -> list[PersonDetection]:
-        """Ejecuta inferencia y retorna solo detecciones clase person (id 0)."""
-        detections: list[PersonDetection] = []
+    def detect(self, frame: Any) -> list[Detection]:
+        """Ejecuta inferencia y retorna detecciones de dominio para persona."""
+        detections: list[Detection] = []
         results = self._infer(frame)
 
         for result in results:
@@ -102,12 +91,11 @@ class YoloPersonDetector:
 
                 x1, y1, x2, y2 = _xyxy_to_ints(getattr(box, "xyxy"))
                 detections.append(
-                    PersonDetection(
-                        x1=x1,
-                        y1=y1,
-                        x2=x2,
-                        y2=y2,
+                    Detection(
+                        subject=Person(),
                         confidence=confidence,
+                        bbox=BoundingBox(x1=x1, y1=y1, x2=x2, y2=y2),
+                        source="yolo",
                     )
                 )
 

@@ -46,7 +46,7 @@ En `pyproject.toml` hay tres scripts:
 
 ### B) Preview YOLO
 
-1. Se carga modelo (`YoloPersonDetector.from_model_path`).
+1. Se carga modelo (`YoloPoseByteTrackDetector.from_model_path`).
 2. Loop: `read` -> `detect` -> dibujar boxes -> overlay global -> `imshow`.
 3. El detector parsea salida cruda de Ultralytics y filtra clase persona.
 
@@ -82,8 +82,8 @@ Ejecucion:
 
 ```bash
 uv run vision-camera
-uv run vision-yolo --model yolov8n.pt --confidence 0.45
-uv run vision-yolo --camera-index 0 --width 1280 --height 720 --model yolov8n.pt --confidence 0.45
+uv run vision-yolo --model yolo11n-pose.pt --confidence 0.45 --tracker-config bytetrack.yaml
+uv run vision-yolo --camera-index 0 --width 1280 --height 720 --model yolo11n-pose.pt --confidence 0.45 --tracker-config bytetrack.yaml
 ```
 
 ## 8. Donde profundizar con zoom

@@ -43,19 +43,31 @@ Variables de entorno soportadas:
 - `VISION_CAMERA_FPS`
 - `VISION_YOLO_MODEL`
 - `VISION_YOLO_CONFIDENCE`
+- `VISION_YOLO_TRACKER`
+- `VISION_YOLO_DRAW_SKELETON`
 
 Ejemplo:
 
-`VISION_YOLO_MODEL=yolov8n.pt VISION_YOLO_CONFIDENCE=0.5 uv run vision-yolo`
+`VISION_YOLO_MODEL=yolo11n-pose.pt VISION_YOLO_CONFIDENCE=0.45 VISION_YOLO_TRACKER=bytetrack.yaml uv run vision-yolo`
 
 ## Hito A.4 - Integracion YOLO (person)
 
 Ejecutar deteccion de personas en vivo:
 
-`uv run vision-yolo --camera-index 0 --width 1280 --height 720 --model yolov8n.pt --confidence 0.45`
+`uv run vision-yolo --camera-index 0 --width 1280 --height 720 --model yolo11n-pose.pt --confidence 0.45 --tracker-config bytetrack.yaml`
 
 Se muestran:
 
 - Bounding boxes
+- Track ID
+- Keypoints
+- Skeleton (opcional con `--draw-skeleton` / `--no-draw-skeleton`)
 - Confidence
 - FPS
+
+## Modulos principales (actual)
+
+- `detectors/yolo_pose_bytetrack.py`: adaptador de inferencia+tracking con Ultralytics.
+- `models/tracked_person.py`: entidad de dominio trackeada.
+- `app/pose_renderer.py`: render modular de bbox, keypoints, skeleton y overlays.
+- `app/yolo_person_preview.py`: composition root del preview en vivo.

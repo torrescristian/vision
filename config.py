@@ -20,8 +20,10 @@ class CameraConfig:
 class YoloConfig:
     """Configuracion del modelo YOLO."""
 
-    model_path: str = "yolov8n.pt"
+    model_path: str = "yolo11n-pose.pt"
     person_confidence_threshold: float = 0.45
+    tracker_config: str = "bytetrack.yaml"
+    draw_skeleton: bool = True
 
 
 @dataclass(frozen=True, slots=True)
@@ -55,6 +57,18 @@ def _env_str(name: str, default: str) -> str:
     return value
 
 
+def _env_bool(name: str, default: bool) -> bool:
+    value = os.getenv(name)
+    if value is None:
+        return default
+    normalized = value.strip().lower()
+    if normalized in {"1", "true", "yes", "on"}:
+        return True
+    if normalized in {"0", "false", "no", "off"}:
+        return False
+    raise ValueError(f"Valor invalido para {name}: {value}")
+
+
 def load_config() -> AppConfig:
     """Carga la configuracion, permitiendo override por variables de entorno."""
     # Fuente de verdad de runtime: los entrypoints no hardcodean parametros,
@@ -67,7 +81,9 @@ def load_config() -> AppConfig:
             target_fps=_env_int("VISION_CAMERA_FPS", 30),
         ),
         yolo=YoloConfig(
-            model_path=_env_str("VISION_YOLO_MODEL", "yolov8n.pt"),
+            model_path=_env_str("VISION_YOLO_MODEL", "yolo11n-pose.pt"),
             person_confidence_threshold=_env_float("VISION_YOLO_CONFIDENCE", 0.45),
+            tracker_config=_env_str("VISION_YOLO_TRACKER", "bytetrack.yaml"),
+            draw_skeleton=_env_bool("VISION_YOLO_DRAW_SKELETON", True),
         ),
     )
