@@ -30,3 +30,32 @@ Ejecutar preview de webcam con FPS:
 `uv run vision-camera --camera-index 0 --width 1280 --height 720`
 
 Salir con `q` o `ESC`.
+
+## Hito A.3 - Configuracion Centralizada
+
+Archivo central: `config.py`
+
+Variables de entorno soportadas:
+
+- `VISION_CAMERA_INDEX`
+- `VISION_CAMERA_WIDTH`
+- `VISION_CAMERA_HEIGHT`
+- `VISION_CAMERA_FPS`
+- `VISION_YOLO_MODEL`
+- `VISION_YOLO_CONFIDENCE`
+
+Ejemplo:
+
+`VISION_YOLO_MODEL=yolov8n.pt VISION_YOLO_CONFIDENCE=0.5 uv run vision-yolo`
+
+## Hito A.4 - Integracion YOLO (person)
+
+Ejecutar deteccion de personas en vivo:
+
+`uv run vision-yolo --camera-index 0 --width 1280 --height 720 --model yolov8n.pt --confidence 0.45`
+
+Se muestran:
+
+- Bounding boxes
+- Confidence
+- FPS

@@ -124,6 +124,30 @@ Configurar:
 - modelo YOLO
 - cámara
 
+### Estado
+
+Completado (2026-07-12).
+
+### Evidencia de implementación
+
+- Configuración central creada en `config.py`.
+- Carga tipada de configuración mediante `load_config()` con defaults y override por variables de entorno.
+- Integración activa en runners de cámara/YOLO.
+
+### Verificación técnica
+
+- `uv run ruff check .` en verde.
+- `uv run pyright .` en verde.
+- `uv run pytest` en verde.
+
+### Tests manuales
+
+Ver checklist: [a3_tests_manuales.md](a3_tests_manuales.md)
+
+### Criterio de salida
+
+Cumplido.
+
 ---
 
 # Hito A.4 - Integración YOLO
@@ -147,6 +171,32 @@ Bounding Boxes.
 Confidence.
 
 FPS.
+
+### Estado
+
+Completado (2026-07-12).
+
+### Evidencia de implementación
+
+- Integración YOLO implementada con detector de personas en `detectors/yolo_person.py`.
+- Runner en vivo agregado en `app/yolo_person_preview.py`.
+- Script CLI disponible: `uv run vision-yolo`.
+- Overlay en runtime con bounding boxes, confidence y FPS.
+
+### Verificación técnica
+
+- `uv run ruff check .` en verde.
+- `uv run pyright .` en verde.
+- `uv run pytest` en verde.
+- Corrida manual confirmada: `uv run vision-yolo --camera-index 0 --width 1280 --height 720 --model yolov8n.pt --confidence 0.45`.
+
+### Tests manuales
+
+Ver checklist: [a4_tests_manuales.md](a4_tests_manuales.md)
+
+### Criterio de salida
+
+Cumplido.
 
 ---
 

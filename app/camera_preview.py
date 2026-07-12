@@ -10,6 +10,8 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Any
 
+from config import load_config
+
 EXIT_KEYS = (ord("q"), 27)
 
 
@@ -31,7 +33,7 @@ def compute_fps(previous_tick: float, current_tick: float) -> float:
     return 1.0 / delta
 
 
-def _load_cv2(cv2_module: Any | None) -> Any:
+def load_cv2(cv2_module: Any | None) -> Any:
     """Permite inyectar cv2 en tests y usar import real en runtime."""
     if cv2_module is not None:
         return cv2_module
@@ -41,7 +43,7 @@ def _load_cv2(cv2_module: Any | None) -> Any:
     return imported_cv2
 
 
-def _open_capture(cv2: Any, config: CameraPreviewConfig) -> Any:
+def open_capture(cv2: Any, config: CameraPreviewConfig) -> Any:
     """Abre la camara y aplica resolucion objetivo."""
     capture = cv2.VideoCapture(config.camera_index)
     if not capture.isOpened():
@@ -52,7 +54,7 @@ def _open_capture(cv2: Any, config: CameraPreviewConfig) -> Any:
     return capture
 
 
-def _initialize_window(cv2: Any, window_name: str) -> None:
+def initialize_window(cv2: Any, window_name: str) -> None:
     """Inicializa la ventana de forma explicita para evitar glitches de UI en macOS."""
     window_flags = getattr(cv2, "WINDOW_NORMAL", 0)
     cv2.namedWindow(window_name, window_flags)
@@ -78,7 +80,7 @@ def _draw_overlay(cv2: Any, frame: Any, fps: float) -> None:
     )
 
 
-def _print_startup_message(config: CameraPreviewConfig) -> None:
+def print_startup_message(config: CameraPreviewConfig) -> None:
     print(
         f"[vision-camera] Camara {config.camera_index} iniciada en "
         f"{config.width}x{config.height}. Presiona q o ESC para salir.",
@@ -86,7 +88,7 @@ def _print_startup_message(config: CameraPreviewConfig) -> None:
     )
 
 
-def _ensure_graphical_session() -> None:
+def ensure_graphical_session() -> None:
     # Si existe SSH_CONNECTION, probablemente no hay contexto grafico local para abrir ventanas.
     if os.environ.get("SSH_CONNECTION"):
         raise RuntimeError(
@@ -110,10 +112,10 @@ def run_camera_preview(
         height=height,
         window_name=window_name,
     )
-    cv2 = _load_cv2(cv2_module)
-    capture = _open_capture(cv2, config)
-    _initialize_window(cv2, config.window_name)
-    _print_startup_message(config)
+    cv2 = load_cv2(cv2_module)
+    capture = open_capture(cv2, config)
+    initialize_window(cv2, config.window_name)
+    print_startup_message(config)
 
     last_tick = time.perf_counter()
     try:
@@ -138,16 +140,32 @@ def run_camera_preview(
 
 
 def _build_parser() -> argparse.ArgumentParser:
+    app_config = load_config()
     parser = argparse.ArgumentParser(description="Captura webcam con FPS en vivo")
-    parser.add_argument("--camera-index", type=int, default=0, help="Indice de camara")
-    parser.add_argument("--width", type=int, default=1280, help="Resolucion horizontal")
-    parser.add_argument("--height", type=int, default=720, help="Resolucion vertical")
+    parser.add_argument(
+        "--camera-index",
+        type=int,
+        default=app_config.camera.index,
+        help="Indice de camara",
+    )
+    parser.add_argument(
+        "--width",
+        type=int,
+        default=app_config.camera.width,
+        help="Resolucion horizontal",
+    )
+    parser.add_argument(
+        "--height",
+        type=int,
+        default=app_config.camera.height,
+        help="Resolucion vertical",
+    )
     return parser
 
 
 def main(argv: Sequence[str] | None = None) -> None:
     """CLI del preview de webcam."""
-    _ensure_graphical_session()
+    ensure_graphical_session()
 
     parser = _build_parser()
     args = parser.parse_args(argv)
